@@ -1,0 +1,4 @@
+#Tue Nov 07 16:37:03 IST 2023
+base.0=/Users/sanmac/Documents/Flutter_workspace/EmployeesCRUD/build/app/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

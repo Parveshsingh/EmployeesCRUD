@@ -27,6 +27,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late HomePageBloc _bloc;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _isSnackBarActive = false;
 
   @override
   void initState() {
@@ -60,10 +61,9 @@ class _HomePageState extends State<HomePage> {
           title: const Text("Employee List"),
           actions: [
             IconButton(
-              tooltip: "Refresh",
+                tooltip: "Refresh",
                 onPressed: () {
-                  ScaffoldMessenger.of(
-                      _scaffoldKey.currentContext!)
+                  ScaffoldMessenger.of(_scaffoldKey.currentContext!)
                       .hideCurrentSnackBar();
                   _bloc.add(BlocEvent(event: HomePageEvent.list));
                 },
@@ -107,6 +107,9 @@ class _HomePageState extends State<HomePage> {
               showSnackBarPreviousEmployees(state.data);
             } else if (state.state == HomePageState.removePermanentlySuccess) {
               cancelLoader(context);
+              setState(() {
+                _isSnackBarActive = false;
+              });
               _bloc.add(BlocEvent(event: HomePageEvent.list));
             } else if (state.state ==
                 HomePageState.undoCurrentEmployeesSuccess) {
@@ -159,9 +162,12 @@ class _HomePageState extends State<HomePage> {
                                     children: [
                                       SlidableAction(
                                         onPressed: (context1) {
-                                          ScaffoldMessenger.of(
-                                                  _scaffoldKey.currentContext!)
-                                              .hideCurrentSnackBar();
+                                          if (_isSnackBarActive) {
+                                            ScaffoldMessenger.of(_scaffoldKey
+                                                    .currentContext!)
+                                                .hideCurrentSnackBar();
+                                          }
+
                                           showAlertDialog(context,
                                               dialogTitle: "Delete Alert",
                                               isCancellable: true,
@@ -243,9 +249,11 @@ class _HomePageState extends State<HomePage> {
                                     children: [
                                       SlidableAction(
                                         onPressed: (context1) {
-                                          ScaffoldMessenger.of(
-                                                  _scaffoldKey.currentContext!)
-                                              .hideCurrentSnackBar();
+                                          if (_isSnackBarActive) {
+                                            ScaffoldMessenger.of(_scaffoldKey
+                                                    .currentContext!)
+                                                .hideCurrentSnackBar();
+                                          }
                                           showAlertDialog(context,
                                               dialogTitle: "Delete Alert",
                                               isCancellable: true,
@@ -330,6 +338,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   void showSnackBarPreviousEmployees(index) {
+    setState(() {
+      _isSnackBarActive = true;
+    });
     final snackBar = SnackBar(
       content: const Text('Employee Data Has Been Deleted'),
       action: SnackBarAction(
@@ -338,7 +349,7 @@ class _HomePageState extends State<HomePage> {
           _bloc.add(BlocEvent(
               event: HomePageEvent.undoPreviousEmployeesData, data: index));
           ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-              .hideCurrentSnackBar();
+              .removeCurrentSnackBar();
         },
       ),
     );
@@ -347,12 +358,22 @@ class _HomePageState extends State<HomePage> {
         .showSnackBar(snackBar)
         .closed
         .then((reason) {
-      printText("The snackbar Closed previous");
-      _bloc.add(BlocEvent(event: HomePageEvent.removePermanently));
+      if (reason == SnackBarClosedReason.timeout) {
+        _bloc.add(BlocEvent(event: HomePageEvent.removePermanently));
+      } else if (reason == SnackBarClosedReason.hide) {
+        _bloc.add(BlocEvent(event: HomePageEvent.removePermanently));
+      } else if (reason == SnackBarClosedReason.dismiss) {
+        _bloc.add(BlocEvent(event: HomePageEvent.removePermanently));
+      } else if (reason == SnackBarClosedReason.swipe) {
+        _bloc.add(BlocEvent(event: HomePageEvent.removePermanently));
+      }
     });
   }
 
   void showSnackBar(index) {
+    setState(() {
+      _isSnackBarActive = true;
+    });
     final snackBar = SnackBar(
       content: const Text('Employee Data Has Been Deleted'),
       action: SnackBarAction(
@@ -361,7 +382,7 @@ class _HomePageState extends State<HomePage> {
           _bloc.add(BlocEvent(
               event: HomePageEvent.undoCurrentEmployeesData, data: index));
           ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-              .hideCurrentSnackBar();
+              .removeCurrentSnackBar();
         },
       ),
     );
@@ -370,8 +391,15 @@ class _HomePageState extends State<HomePage> {
         .showSnackBar(snackBar)
         .closed
         .then((reason) {
-      printText("The snackbar Closed Current");
-      _bloc.add(BlocEvent(event: HomePageEvent.removePermanently));
+      if (reason == SnackBarClosedReason.timeout) {
+        _bloc.add(BlocEvent(event: HomePageEvent.removePermanently));
+      } else if (reason == SnackBarClosedReason.hide) {
+        _bloc.add(BlocEvent(event: HomePageEvent.removePermanently));
+      } else if (reason == SnackBarClosedReason.dismiss) {
+        _bloc.add(BlocEvent(event: HomePageEvent.removePermanently));
+      } else if (reason == SnackBarClosedReason.swipe) {
+        _bloc.add(BlocEvent(event: HomePageEvent.removePermanently));
+      }
     });
   }
 }
